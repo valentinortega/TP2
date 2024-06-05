@@ -9,7 +9,7 @@ with open("envios25.txt", "r") as archivo:
 
 
 
-falta una funcion que saque solo el cp
+# falta una funcion que saque solo el cp
 
 
 
