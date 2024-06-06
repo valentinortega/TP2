@@ -1,20 +1,14 @@
 # Llamamos al archivo que tiene el texto
-
-archivo = open("envios25.txt", "r")
+archivo = open("envios100HC.txt", "r")
 # Asignamos "texto" a la cadena del texto completo
-with open("envios25.txt", "r") as archivo:
-    for linea in archivo:
-        pass#   print(linea)
+
 # texto = archivo.read()
 
-
-
+texto = 'HC � 18:15 � 10/06/2020'
 # falta una funcion que saque solo el cp
 
 
-
-
-ora = ' 195256  Do Porto 1357.      32'
+ora = ' B0279NGKLibertad 1357.      42'
 
 def hc_o_sc(oracion):
     """Esta función nos permite identificar si la estructura de control
@@ -44,11 +38,20 @@ def contar_len_cp(oracion):
         if oracion[i] != ' ':
             contador += 1
     return contador
+def rescatar_cp (oracion):
+    """Esta función cuenta cuántos caracteres DIREFENTES de ' ' (blancos)
+       tiene la linea en los primeros 9 caracteres"""
+    cp  = ''
+    for i in range(9):
+        if oracion[i] != ' ':
+            cp += oracion[i]
+    return cp
 # contador = contar_len_cp(ora)
 def definir_pais(oracion):
     """Esta función nos permite ver de qué pais y región es el cp"""
     # Usamos la función contar_len_cp() dentro de la función definir_pais
-    contador = contar_len_cp(oracion)
+    cp = rescatar_cp(oracion)
+    contador = len(cp)
     pais = None
     if contador == 4:
         dig = 0
@@ -112,7 +115,7 @@ def definir_pais(oracion):
                 continue
             elif i.isalpha() and primero:
                 primero = False
-                if i in prov:
+                if i.lower() in prov:
                     verif += 1
                 else:
                     primero = True
@@ -131,21 +134,23 @@ def definir_pais(oracion):
         pais = 'otros'
     return pais
 def precio_envio(oracion):
-    """Devuelve el id del envío y el valor a pagar. Todo en int"""
-    if oracion[-2] == '0':
-        return int(oracion[-2]), 1100
-    elif oracion[-2] == '1':
-        return int(oracion[-2]), 1800
-    elif oracion[-2] == '2':
-        return int(oracion[-2]), 2450
-    elif oracion[-2] == '3':
-        return int(oracion[-2]), 8300
-    elif oracion[-2] == '4':
-        return int(oracion[-2]), 10900
-    elif oracion[-2] == '5':
-        return int(oracion[-2]), 14300
-    elif oracion[-2] == '6':
-        return int(oracion[-2]), 17900
+    """Devuelve el id del envío y el valor a pagar.
+    Hay que poner '-3' porque el último caracter de cada
+    linea es '\n' """
+    if oracion[-3] == '0':
+        return int(oracion[-3]), 1100
+    elif oracion[-3] == '1':
+        return int(oracion[-3]), 1800
+    elif oracion[-3] == '2':
+        return int(oracion[-3]), 2450
+    elif oracion[-3] == '3':
+        return int(oracion[-3]), 8300
+    elif oracion[-3] == '4':
+        return int(oracion[-3]), 10900
+    elif oracion[-3] == '5':
+        return int(oracion[-3]), 14300
+    elif oracion[-3] == '6':
+        return int(oracion[-3]), 17900
 def ajuste_precios(region):
     """Devuelve el valor para multiplicar al precio para ajustar al exterior"""
     region_20 = 'bolivia', 'paraguay', 'montevideo' 'brasil_20'
@@ -190,27 +195,163 @@ def validar_direccion(oracion):
         return True
     else:
         return False
+def mayor_carta(cs, cc, ce):
+    """Devuelve la carta con más ocurrencias"""
+    if cs > cc and cs > ce:
+        mayor = "Carta Simple"
+    elif cc > ce:
+        mayor = 'Carta Certificada'
+    else:
+        mayor = 'Carta Expresa'
+    return mayor
+def calcular_promedio(cant, total):
+    if total == 0:
+        prom = 0
+    else:
+        prom = int(cant/total)
+    return prom
+def calcular_porcentaje(cant, total):
+    if total == 0:
+        porc = 0
+    else:
+        porc = int(cant*100/total)
+    return porc
+def es_brasil(region):
+    if region in ('brasil_20', 'brasil_25', 'brasil_30'):
+        return True
+    else:
+        return False
+def es_exterior(region):
+    if region != 'argentina':
+        return True
+    else:
+        return False
+def es_bsas(cp):
+    if len(cp) == 8 and cp[0].lower() == 'b':
+        return True
+    else:
+        return False
 
-direccion = validar_direccion(ora)
-print(direccion)
-
+# cp = rescatar_cp(ora)
+# direccion = validar_direccion(ora)
+# print(f'cp -> {cp}')
+#
 # control = hc_o_sc(texto)
 # pais = definir_pais(ora)
 # precio = precio_envio(ora)
 # ajuste = ajuste_precios(pais)
-# print(control)
+# print(f'control -> {control}')
 # # print(contador)
-# print(pais)
-# print(precio)
-# print(ajuste)
+# print(f'pais -> {pais}')
+# print(f'precio -> {precio}')
+# print(f'ajuste -> {ajuste}')
+# print(f'direccion -> {direccion}')
+
+hc = sc = False
+prim_linea = seg_linea = True
+control = tipo_mayor = primer_cp = menimp = mencp = None
+cedvalid = cedinvalid = imp_acu_total = ccs = ccc = cce = \
+contador = exterior = cont_bsas = suma_bsas = 0
+cant_primer_cp = 1
+with open("envios100HC.txt", "r") as archivo:
+
+    for linea in archivo:
+        region = definir_pais(linea)
+        if prim_linea:
+            control = hc_o_sc(linea)
+            if control == 'Hard Control':
+                hc = True
+            elif control == 'Soft Control':
+                sc = True
+            prim_linea = False
+        else:
+            contador += 1
+            if seg_linea:
+                primer_cp = rescatar_cp(linea)
+                seg_linea = False
+            elif rescatar_cp(linea) == primer_cp:
+                cant_primer_cp += 1
+            if hc:
+                if validar_direccion(linea):
+                    cedvalid += 1
+                    cp = rescatar_cp(linea)
+                    precio = precio_envio(linea)
+                    ajuste = ajuste_precios(region)
+                    imp_acu_total += precio[1] * ajuste
+                    # print(contador, region, rescatar_cp(linea))
+                    if precio[0] == 0 or precio[0] == 1 or precio[0] == 2:
+                        ccs += 1
+                    elif precio[0] == 3 or precio[0] == 4:
+                        ccc += 1
+                    elif precio[0] == 5 or precio[0] == 6:
+                        cce += 1
+
+                    if es_exterior(region):
+                        exterior += 1
+                    elif es_bsas(cp):
+                        cont_bsas += 1
+                        suma_bsas += precio[1] * ajuste
+                else:
+                    cedinvalid += 1
+
+                if es_brasil(region):
+                    if menimp == None or precio[1] < menimp:
+                        menimp = precio[1]*ajuste
+                        mencp = rescatar_cp(linea)
+
+
+            elif sc:
+                contador += 1
+                cedvalid += 1
+                precio = precio_envio(linea)
+                ajuste = ajuste_precios(region)
+                imp_acu_total += precio[1] * ajuste
+                if precio[0] in (0, 1, 2):
+                    ccs += 1
+                elif precio[0] in (3, 4):
+                    ccc += 1
+                elif precio[0] in (5, 6):
+                    cce += 1
+
+                if seg_linea:
+                    primer_cp = rescatar_cp(linea)
+                    seg_linea = False
+                elif rescatar_cp(linea) == primer_cp:
+                    cant_primer_cp += 1
+
+                if es_brasil(region):
+                    if menimp == None or precio[1] < menimp:
+                        menimp = precio[1]*ajuste
+                        mencp = rescatar_cp(linea)
+                if es_exterior(region):
+                    exterior += 1
+                elif es_bsas(cp):
+                    cont_bsas += 1
+                    suma_bsas += precio[1] * ajuste
+            tipo_mayor = mayor_carta(ccs, ccc, cce)
+            porc = calcular_porcentaje(exterior, cedvalid)
+            prom = calcular_promedio(suma_bsas, cont_bsas)
 
 
 
 
 
 
-
-
+    #
+    print(' (r1) - Tipo de control de direcciones:', control)
+    print(' (r2) - Cantidad de envios con direccion valida:', cedvalid)
+    print(' (r3) - Cantidad de envios con direccion no valida:', cedinvalid)
+    print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
+    print(' (r5) - Cantidad de cartas simples:', ccs)
+    print(' (r6) - Cantidad de cartas certificadas:', ccc)
+    print(' (r7) - Cantidad de cartas expresas:', cce)
+    print(' (r8) - Tipo de carta con mayor cantidad de envios:', tipo_mayor)
+    print(' (r9) - Codigo postal del primer envio del archivo:', primer_cp)
+    print('(r10) - Cantidad de veces que entro ese primero:', cant_primer_cp)
+    print('(r11) - Importe menor pagado por envios a Brasil:', menimp)
+    print('(r12) - Codigo postal del envio a Brasil con importe menor:', mencp)
+    print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
+    print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
 
 
 
