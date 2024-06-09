@@ -1,14 +1,14 @@
 # Llamamos al archivo que tiene el texto
-archivo = open("envios100HC.txt", "r")
-# Asignamos "texto" a la cadena del texto completo
-
-# texto = archivo.read()
-
-texto = 'HC � 18:15 � 10/06/2020'
-# falta una funcion que saque solo el cp
-
-
-ora = '82438-620Oscar Freire 1357.  52\n'
+# archivo = open("envios100HC.txt", "r")
+# # Asignamos "texto" a la cadena del texto completo
+#
+# # texto = archivo.read()
+#
+# texto = 'HC � 18:15 � 10/06/2020'
+# # falta una funcion que saque solo el cp
+#
+#
+# ora = '22704-171Oscar Freire 1357.  52\n'
 
 def hc_o_sc(oracion):
     """Esta función nos permite identificar si la estructura de control
@@ -48,14 +48,15 @@ def rescatar_cp (oracion):
     return cp
 # contador = contar_len_cp(ora)
 def definir_pais(oracion):
+
     """Esta función nos permite ver de qué pais y región es el cp"""
     # Usamos la función contar_len_cp() dentro de la función definir_pais
-    cp = rescatar_cp(oracion)
-    contador = len(cp)
+    cod_p = rescatar_cp(oracion)
+    contador = len(cod_p)
     pais = None
     if contador == 4:
         dig = 0
-        for i in cp:
+        for i in cod_p:
             if i.isdigit():
                 dig += 1
         if dig == 4:
@@ -64,7 +65,7 @@ def definir_pais(oracion):
         primero = True
         mont = None
         dig = 0
-        for i in cp:
+        for i in cod_p:
             if i == ' ':
                 continue
             elif i.isdigit():
@@ -79,29 +80,29 @@ def definir_pais(oracion):
                 pais = 'montevideo'
     elif contador == 6:
         dig = 0
-        for i in cp:
+        for i in cod_p:
             if i.isdigit():
                 dig += 1
         if dig == 6:
             pais = 'paraguay'
     elif contador == 7:
         dig = 0
-        for i in cp:
+        for i in cod_p:
             if i.isdigit():
                 dig += 1
         if dig == 7:
             pais = 'chile'
     elif contador == 9:
         dig = 0
-        for i in cp:
+        for i in cod_p:
             if i.isdigit():
                 dig += 1
-        if dig == 8 and cp[5] == '-':
-            if cp[0] == '8' or cp[0] == '9':
+        if dig == 8 and cod_p[5] == '-':
+            if cod_p[0] == '8' or cod_p[0] == '9':
                 pais = 'brasil_20'
-            elif cp[0] == '0' or cp[0] == '1' or cp[0] == '2' or cp[0] == '3':
+            elif cod_p[0] == '0' or cod_p[0] == '1' or cod_p[0] == '2' or cod_p[0] == '3':
                 pais = 'brasil_25'
-            elif cp[0] == '4' or cp[0] == '5' or cp[0] == '6' or cp[0] == '7':
+            elif cod_p[0] == '4' or cod_p[0] == '5' or cod_p[0] == '6' or cod_p[0] == '7':
                 pais = 'brasil_30'
     elif contador == 8:
         prov = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q',
@@ -110,7 +111,7 @@ def definir_pais(oracion):
         primero = True
         dig = 0
         letra = 0
-        for i in cp:
+        for i in cod_p:
             if i == ' ':
                 continue
             elif i.isalpha() and primero:
@@ -137,20 +138,23 @@ def precio_envio(oracion):
     """Devuelve el id del envío y el valor a pagar.
     Hay que poner '-3' porque el último caracter de cada
     linea es '\n' """
-    if oracion[-3] == '0':
-        return int(oracion[-3]), 1100
-    elif oracion[-3] == '1':
-        return int(oracion[-3]), 1800
-    elif oracion[-3] == '2':
-        return int(oracion[-3]), 2450
-    elif oracion[-3] == '3':
-        return int(oracion[-3]), 8300
-    elif oracion[-3] == '4':
-        return int(oracion[-3]), 10900
-    elif oracion[-3] == '5':
-        return int(oracion[-3]), 14300
-    elif oracion[-3] == '6':
-        return int(oracion[-3]), 17900
+    pen_ult = -2
+    if oracion[-1] == '\n':
+        pen_ult = -3
+    if oracion[pen_ult] == '0':
+        return int(oracion[pen_ult]), 1100
+    elif oracion[pen_ult] == '1':
+        return int(oracion[pen_ult]), 1800
+    elif oracion[pen_ult] == '2':
+        return int(oracion[pen_ult]), 2450
+    elif oracion[pen_ult] == '3':
+        return int(oracion[pen_ult]), 8300
+    elif oracion[pen_ult] == '4':
+        return int(oracion[pen_ult]), 10900
+    elif oracion[pen_ult] == '5':
+        return int(oracion[pen_ult]), 14300
+    elif oracion[pen_ult] == '6':
+        return int(oracion[pen_ult]), 17900
 def ajuste_precios(region):
     """Devuelve el valor para multiplicar al precio para ajustar al exterior"""
     region_20 = 'bolivia', 'paraguay', 'montevideo', 'brasil_20'
@@ -226,37 +230,26 @@ def es_exterior(region):
         return True
     else:
         return False
-def es_bsas(cp):
-    if len(cp) == 8 and cp[0].lower() == 'b':
+def es_bsas(region, cp):
+    if region == 'argentina' and cp[0].lower() == 'b':
         return True
     else:
         return False
-
-cp = rescatar_cp(ora)
-direccion = validar_direccion(ora)
-print(f'cp -> {cp}')
-
-control = hc_o_sc(texto)
-pais = definir_pais(ora)
-precio = precio_envio(ora)
-ajuste = ajuste_precios(pais)
-print(f'control -> {control}')
-# print(contador)
-print(f'pais -> {pais}')
-print(f'precio -> {precio}')
-print(f'ajuste -> {ajuste}')
-print(f'direccion -> {direccion}')
+def tiene_descuento(oracion):
+    if oracion[-2] == '1':
+        return True
+    else:
+        return False
 
 hc = sc = False
 prim_linea = seg_linea = True
 control = tipo_mayor = primer_cp = menimp = mencp = None
 cedvalid = cedinvalid = imp_acu_total = ccs = ccc = cce = \
 contador = exterior = cont_bsas = suma_bsas = 0
-cant_primer_cp = 1
-with open("envios100SC.txt", "r") as archivo:
+cant_primer_cp = descuento = 1
+with open("envios500b.txt", "r") as archivo:
 
     for linea in archivo:
-
         if prim_linea:
             control = hc_o_sc(linea)
             if control == 'Hard Control':
@@ -265,23 +258,35 @@ with open("envios100SC.txt", "r") as archivo:
                 sc = True
             prim_linea = False
         else:
+            contador += 1
+            cp = rescatar_cp(linea)
+            if seg_linea:
+                primer_cp = cp
+                seg_linea = False
+            elif cp == primer_cp:
+                cant_primer_cp += 1
+            region = definir_pais(linea)
+            descuento = 1
+            if tiene_descuento(linea):
+                descuento = 0.9
+            precio = precio_envio(linea)
+            ajuste = ajuste_precios(region)
+            importe = round(precio[1] * ajuste * descuento)
+
+            if es_brasil(region):
+                if menimp == None or importe < menimp:
+                    menimp = importe
+                    mencp = cp
+                    # print(menimp, mencp)
             if hc:
                 if validar_direccion(linea):
                     # print(linea)
-                    cp = rescatar_cp(linea)
-                    contador += 1
-                    cedvalid += 1
-                    if seg_linea:
-                        primer_cp = rescatar_cp(linea)
-                        seg_linea = False
-                    elif cp == primer_cp:
-                        cant_primer_cp += 1
+                    # cp = rescatar_cp(linea)
 
-                    region = definir_pais(linea)
-                    precio = precio_envio(linea)
-                    ajuste = ajuste_precios(region)
-                    importe = precio[1] * ajuste
-                    imp_acu_total += importe
+                    cedvalid += 1
+                    imp_acu_total += round(importe)
+
+
                     # print(contador, region, rescatar_cp(linea))
 
                     if precio[0] == 0 or precio[0] == 1 or precio[0] == 2:
@@ -293,18 +298,12 @@ with open("envios100SC.txt", "r") as archivo:
 
                     if es_exterior(region):
                         exterior += 1
-                    elif es_bsas(cp):
+                    elif es_bsas(region, cp):
                         cont_bsas += 1
                         suma_bsas += importe
-                    if es_brasil(region):
-                        if menimp == None or precio[1] < menimp:
-                            menimp = precio[1]*ajuste
-                            mencp = rescatar_cp(linea)
+
                 else:
                     cedinvalid += 1
-
-
-
 
             elif sc:
                 contador += 1
@@ -312,9 +311,12 @@ with open("envios100SC.txt", "r") as archivo:
                 cp = rescatar_cp(linea)
                 region = definir_pais(linea)
                 precio = precio_envio(linea)
+                descuento = 1
+                if tiene_descuento(linea):
+                    descuento = 0.9
                 ajuste = ajuste_precios(region)
-                importe = precio[1] * ajuste
-                imp_acu_total += importe
+                importe = precio[1] * ajuste * descuento
+                imp_acu_total += round(importe)
 
                 if precio[0] in (0, 1, 2):
                     ccs += 1
@@ -322,26 +324,20 @@ with open("envios100SC.txt", "r") as archivo:
                     ccc += 1
                 elif precio[0] in (5, 6):
                     cce += 1
-
-                if seg_linea:
-                    primer_cp = rescatar_cp(linea)
-                    seg_linea = False
-                elif rescatar_cp(linea) == primer_cp:
-                    cant_primer_cp += 1
-
-                if es_brasil(region):
-                    if menimp == None or precio[1] < menimp:
-                        menimp = precio[1]*ajuste
-                        mencp = rescatar_cp(linea)
+                # if es_brasil(region):
+                #     if menimp == None or precio[1] < menimp:
+                #         menimp = int(precio[1]*ajuste)
+                #         mencp = rescatar_cp(linea)
                 if es_exterior(region):
                     exterior += 1
-                elif es_bsas(cp):
+                elif es_bsas(region, cp):
                     cont_bsas += 1
-                    suma_bsas += precio[1] * ajuste
-        # print(contador, region, linea)
+                    suma_bsas += importe
+            # print(contador, precio)
     tipo_mayor = mayor_carta(ccs, ccc, cce)
-    porc = calcular_porcentaje(exterior, cedvalid)
+    porc = calcular_porcentaje(exterior, contador)
     prom = calcular_promedio(suma_bsas, cont_bsas)
+    # print(exterior, contador)
 
 
 
