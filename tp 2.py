@@ -289,7 +289,6 @@ def principal():
                         cedinvalid += 1
 
                 elif sc:
-                    contador += 1
                     cedvalid += 1
                     cp = rescatar_cp(linea)
                     region = definir_pais(linea)
