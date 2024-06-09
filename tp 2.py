@@ -339,4 +339,4 @@ def principal():
         print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
         print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
 principal()
-print('hola')
+print('chau')
