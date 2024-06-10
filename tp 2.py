@@ -260,7 +260,7 @@ def principal():
                     descuento = 0.9
                 precio = precio_envio(linea)
                 ajuste = ajuste_precios(region)
-                importe = int(precio[1] * ajuste * descuento)
+                importe = int(int(precio[1] * ajuste) * descuento)
 
                 if es_brasil(region):
                     if menimp == None or importe < menimp:
@@ -297,7 +297,7 @@ def principal():
                     if tiene_descuento(linea):
                         descuento = 0.9
                     ajuste = ajuste_precios(region)
-                    importe = int(precio[1] * ajuste * descuento)
+                    importe = int(int(precio[1] * ajuste) * descuento)
                     imp_acu_total += importe
 
                     if precio[0] in (0, 1, 2):
@@ -339,4 +339,3 @@ def principal():
         print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
         print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
 principal()
-print('chau')
